@@ -1,0 +1,5 @@
+Flask
+Flask-RESTful
+cryptography
+python-dotenv
+Flask-MySQL
