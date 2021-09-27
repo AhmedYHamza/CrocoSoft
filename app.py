@@ -19,11 +19,20 @@ api = Api(app)
 class addDoc(Resource):
     def put(self):
         data = list(request.form.values())
+
         cursor = mysql.get_db().cursor()
         cursor.execute('''
         INSERT INTO document(doc_id,is_from_outside,doc_status,date_created,date_modified)
-        VALUES (%s,%s,%s,%s,%s)''', data)
+        VALUES (%s,%s,%s,%s,%s)''', data[0:5])
         mysql.get_db().commit()
+        if(data[1] == "1"):
+            dataSub = list(data[0])
+            dataSub.append(data[5])
+            dataSub.append(data[6])
+            cursor.execute('''
+            INSERT INTO outside_document(doc_id,receipt_date,receipt_num)
+            VALUES (%s,%s,%s)''', dataSub)
+            mysql.get_db().commit()
         return str(data)
 
 
