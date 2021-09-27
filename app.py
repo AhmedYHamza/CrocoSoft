@@ -26,12 +26,12 @@ class addDoc(Resource):
         VALUES (%s,%s,%s,%s,%s)''', data[0:5])
         mysql.get_db().commit()
         if(data[1] == "1"):
-            dataSub = list(data[0])
-            dataSub.append(data[5])
-            dataSub.append(data[6])
+            datasub = list(data[0])
+            datasub.append(data[5])
+            datasub.append(data[6])
             cursor.execute('''
             INSERT INTO outside_document(doc_id,receipt_date,receipt_num)
-            VALUES (%s,%s,%s)''', dataSub)
+            VALUES (%s,%s,%s)''', datasub)
             mysql.get_db().commit()
         return str(data)
 
@@ -80,6 +80,12 @@ class getDoc(Resource):
         ''', doc_id)
         results = cursor.fetchall()
         print(results)
+        if(results[0][1] == 1):
+            cursor.execute('''
+            SELECT *
+            FROM outside_document
+            WHERE outside_document.doc_id=%s''', doc_id)
+            results = results + cursor.fetchall()[0][1:]
         return str(results)
 
 
@@ -126,6 +132,19 @@ class getEmp(Resource):
 class delDoc(Resource):
     def get(self, doc_id):
         cursor = mysql.get_db().cursor()
+        cursor.execute('''
+        SELECT is_from_outside
+        FROM document
+        WHERE document.doc_id=%s
+        ''', doc_id)
+        results = cursor.fetchall()
+        if(results[0][0] == 1):
+            cursor.execute('''
+            DELETE
+            FROM outside_document
+            WHERE outside_document.doc_id=%s
+            ''', doc_id)
+            mysql.get_db().commit()
         cursor.execute('''
         DELETE
         FROM document
@@ -175,13 +194,24 @@ class delEmp(Resource):
 class updtDoc(Resource):
     def put(self, doc_id):
         data = list(request.form.values())
-        data.append(doc_id)
+        datasub = list(data[0:5])
+        datasub.append(doc_id)
         cursor = mysql.get_db().cursor()
         cursor.execute('''
         UPDATE document 
         SET doc_id=%s,is_from_outside=%s,doc_status=%s,date_created=%s,date_modified=%s
-        WHERE document.doc_id=%s''', data)
+        WHERE document.doc_id=%s''', datasub)
         mysql.get_db().commit()
+        if(data[1] == "1"):
+            datasub = list(data[0])
+            datasub.append(data[5])
+            datasub.append(data[6])
+            datasub.append(doc_id)
+            cursor.execute('''
+            UPDATE outside_document
+            SET doc_id=%s,receipt_date=%s,receipt_num=%s
+            WHERE outside_document.doc_id=%s''', datasub)
+            mysql.get_db().commit()
         return str(data)
 
 
