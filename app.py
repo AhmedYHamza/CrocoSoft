@@ -274,6 +274,23 @@ class transDoc(Resource):
         return str(data)
 
 
+# History
+class getHist(Resource):
+    def put(self, id):
+        data = list(request.form.values())
+        data.append(id)
+        cursor = mysql.get_db().cursor()
+        cursor.execute('''
+        select * 
+        FROM document_circulation
+        where document_circulation.source_type=%s
+        and document_circulation.source_id=%s
+        ''', data)
+        results = cursor.fetchall()
+        print(results)
+        return str(results)
+
+
 # Add
 api.add_resource(addDoc, '/add/doc')
 api.add_resource(addDraft, '/add/drft')
@@ -300,3 +317,6 @@ api.add_resource(updtEmp, '/updt/emp/<int:ssn>')
 
 # Transfer
 api.add_resource(transDoc, '/transdoc')
+
+# History
+api.add_resource(getHist, '/hist/<int:id>')
