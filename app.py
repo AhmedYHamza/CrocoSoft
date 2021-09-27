@@ -19,7 +19,6 @@ api = Api(app)
 class addDoc(Resource):
     def put(self):
         data = list(request.form.values())
-
         cursor = mysql.get_db().cursor()
         cursor.execute('''
         INSERT INTO document(doc_id,is_from_outside,doc_status,date_created,date_modified)
@@ -254,6 +253,27 @@ class updtEmp(Resource):
         return str(data)
 
 
+# Transfer
+class transDoc(Resource):
+    def put(self):
+        data = list(request.form.values())
+        cursor = mysql.get_db().cursor()
+        cursor.execute('''
+        INSERT INTO document_circulation(circulation_id,source_id,source_type,emp_ssn,modify_date)
+        VALUES (%s,%s,%s,%s,%s)''', data)
+        mysql.get_db().commit()
+        if(data[2] == "doc"):
+            datasub = (str("Transfered to employee: " +
+                       data[3]), data[4], data[1])
+            print(datasub)
+            cursor.execute('''
+            UPDATE document
+            SET doc_status=%s,date_modified=%s
+            WHERE document.doc_id=%s''', datasub)
+            mysql.get_db().commit()
+        return str(data)
+
+
 # Add
 api.add_resource(addDoc, '/add/doc')
 api.add_resource(addDraft, '/add/drft')
@@ -277,3 +297,6 @@ api.add_resource(updtDoc, '/updt/doc/<int:doc_id>')
 api.add_resource(updtDraft, '/updt/drft/<int:draft_id>')
 api.add_resource(updtCopy, '/updt/cpy/<int:copy_id>')
 api.add_resource(updtEmp, '/updt/emp/<int:ssn>')
+
+# Transfer
+api.add_resource(transDoc, '/transdoc')
