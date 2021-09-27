@@ -14,6 +14,8 @@ mysql = MySQL(app)
 
 api = Api(app)
 
+# Add queries
+
 
 class addDoc(Resource):
     def put(self):
@@ -59,7 +61,67 @@ class addEmp(Resource):
         return str(data)
 
 
+# get queries
+class getDoc(Resource):
+    def get(self, doc_id):
+        cursor = mysql.get_db().cursor()
+        cursor.execute('''
+        SELECT *
+        FROM document
+        WHERE document.doc_id=%s
+        ''', doc_id)
+        results = cursor.fetchall()
+        print(results)
+        return str(results)
+
+
+class getDraft(Resource):
+    def get(self, draft_id):
+        cursor = mysql.get_db().cursor()
+        cursor.execute('''
+        SELECT *
+        FROM draft
+        WHERE draft.draft_id=%s
+        ''', draft_id)
+        results = cursor.fetchall()
+        print(results)
+        return str(results)
+
+
+class getCopy(Resource):
+    def get(self, copy_id):
+        cursor = mysql.get_db().cursor()
+        cursor.execute('''
+        SELECT *
+        FROM draft_copy
+        WHERE draft_copy.copy_id=%s
+        ''', copy_id)
+        results = cursor.fetchall()
+        print(results)
+        return str(results)
+
+
+class getEmp(Resource):
+    def get(self, ssn):
+        cursor = mysql.get_db().cursor()
+        cursor.execute('''
+        SELECT *
+        FROM employee
+        WHERE employee.ssn=%s
+        ''', ssn)
+        results = cursor.fetchall()
+        print(results)
+        return str(results)
+
+
+# Add
 api.add_resource(addDoc, '/add/doc')
-api.add_resource(addDoc, '/add/drft')
-api.add_resource(addDoc, '/add/cpy')
-api.add_resource(addDoc, '/add/emp')
+api.add_resource(addDraft, '/add/drft')
+api.add_resource(addCopy, '/add/cpy')
+api.add_resource(addEmp, '/add/emp')
+
+# Get
+api.add_resource(getDoc, '/get/doc/<int:doc_id>')
+api.add_resource(getDraft, '/get/drft/<int:draft_id>')
+api.add_resource(getCopy, '/get/cpy/<int:copy_id>')
+api.add_resource(getEmp, '/get/emp/<int:ssn>')
