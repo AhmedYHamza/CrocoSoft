@@ -114,6 +114,55 @@ class getEmp(Resource):
         return str(results)
 
 
+# Delete queries
+class delDoc(Resource):
+    def get(self, doc_id):
+        cursor = mysql.get_db().cursor()
+        cursor.execute('''
+        DELETE
+        FROM document
+        WHERE document.doc_id=%s
+        ''', doc_id)
+        mysql.get_db().commit()
+        return {}
+
+
+class delDraft(Resource):
+    def get(self, draft_id):
+        cursor = mysql.get_db().cursor()
+        cursor.execute('''
+        DELETE
+        FROM draft
+        WHERE draft.draft_id=%s
+        ''', draft_id)
+        mysql.get_db().commit()
+        return {}
+
+
+class delCopy(Resource):
+    def get(self, copy_id):
+        cursor = mysql.get_db().cursor()
+        cursor.execute('''
+        DELETE
+        FROM draft_copy
+        WHERE draft_copy.copy_id=%s
+        ''', copy_id)
+        mysql.get_db().commit()
+        return {}
+
+
+class delEmp(Resource):
+    def get(self, ssn):
+        cursor = mysql.get_db().cursor()
+        cursor.execute('''
+        DELETE
+        FROM employee
+        WHERE employee.ssn=%s
+        ''', ssn)
+        mysql.get_db().commit()
+        return {}
+
+
 # Add
 api.add_resource(addDoc, '/add/doc')
 api.add_resource(addDraft, '/add/drft')
@@ -125,3 +174,9 @@ api.add_resource(getDoc, '/get/doc/<int:doc_id>')
 api.add_resource(getDraft, '/get/drft/<int:draft_id>')
 api.add_resource(getCopy, '/get/cpy/<int:copy_id>')
 api.add_resource(getEmp, '/get/emp/<int:ssn>')
+
+# Delete
+api.add_resource(delDoc, '/del/doc/<int:doc_id>')
+api.add_resource(delDraft, '/del/drft/<int:draft_id>')
+api.add_resource(delCopy, '/del/cpy/<int:copy_id>')
+api.add_resource(delEmp, '/del/emp/<int:ssn>')
