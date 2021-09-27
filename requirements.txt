@@ -3,3 +3,4 @@ Flask-RESTful
 cryptography
 python-dotenv
 Flask-MySQL
+requests
